@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATC Simulator</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; color: white; }
+    canvas { display: block; margin: 0 auto; background: #000022; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Create multiple planes with random positions and directions
+    let planes = [];
+    for (let i = 0; i < 10; i++) {
+      planes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        heading: Math.random() * 2 * Math.PI,
+        speed: 1 + Math.random() * 2
+      });
+    }
+
+    function drawPlane(plane) {
+      ctx.save();
+      ctx.translate(plane.x, plane.y);
+      ctx.rotate(plane.heading);
+      ctx.beginPath();
+      ctx.moveTo(0, -10);
+      ctx.lineTo(6, 8);
+      ctx.lineTo(-6, 8);
+      ctx.closePath();
+      ctx.fillStyle = 'lime';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function updatePlanes() {
+      planes.forEach(plane => {
+        plane.x += Math.cos(plane.heading) * plane.speed;
+        plane.y += Math.sin(plane.heading) * plane.speed;
+
+        // Wrap around screen edges
+        if (plane.x < 0) plane.x = canvas.width;
+        if (plane.x > canvas.width) plane.x = 0;
+        if (plane.y < 0) plane.y = canvas.height;
+        if (plane.y > canvas.height) plane.y = 0;
+      });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      updatePlanes();
+      planes.forEach(drawPlane);
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
